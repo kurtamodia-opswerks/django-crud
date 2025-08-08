@@ -26,7 +26,7 @@ class Intern(models.Model):
     name = models.CharField(max_length=100)
     age = models.IntegerField(validators=[MinValueValidator(18), MaxValueValidator(100)])
     email = models.EmailField()
-    company = models.ForeignKey(Company, on_delete=models.CASCADE, null=True)
+    company = models.ForeignKey(Company, on_delete=models.CASCADE)
     supervisor = models.ForeignKey('Supervisor', on_delete=models.SET_NULL, null=True)
     status = models.CharField(max_length=10, choices=Status.choices, default=Status.ACTIVE)
 
