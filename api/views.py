@@ -71,6 +71,19 @@ class InternCRUDView(BaseCRUDView):
     model = Intern
     form = InternForm
 
+    def get(self, request, pk=None):
+        status_param = request.GET.get("status")
+
+        # If filtering by status
+        if status_param in [Intern.Status.ACTIVE, Intern.Status.INACTIVE]:
+            interns = self.model.objects.filter(status=status_param)
+            data = [model_to_dict(intern) for intern in interns]
+            return JsonResponse(data, safe=False)
+
+        # Default
+        return super().get(request, pk)
+
+
 class SupervisorCRUDView(BaseCRUDView):
     model = Supervisor
     form = SupervisorForm
