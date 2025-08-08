@@ -73,10 +73,25 @@ class InternCRUDView(BaseCRUDView):
 
     def get(self, request, pk=None):
         status_param = request.GET.get("status")
+        company_id = request.GET.get("company_id")
 
         # If filtering by status
         if status_param in [Intern.Status.ACTIVE, Intern.Status.INACTIVE]:
-            interns = self.model.objects.filter(status=status_param)
+            interns = (
+                self.model.objects
+                .select_related('company', 'supervisor')  
+                .filter(status=status_param)
+            )
+            data = [model_to_dict(intern) for intern in interns]
+            return JsonResponse(data, safe=False)
+        
+        # If filtering by company
+        if company_id:
+            interns = (
+                self.model.objects
+                .select_related('company', 'supervisor')
+                .filter(company_id=company_id)
+            )
             data = [model_to_dict(intern) for intern in interns]
             return JsonResponse(data, safe=False)
 
@@ -91,4 +106,16 @@ class SupervisorCRUDView(BaseCRUDView):
 class ProjectCRUDView(BaseCRUDView):
     model = Project
     form = ProjectForm
+
+    def get(self, request, pk=None):
+        # If filtering by intern_id
+        intern_id = request.GET.get("intern_id")
+        if intern_id:
+            projects = self.model.objects.filter(intern_id=intern_id)
+            data = [model_to_dict(project) for project in projects]
+            return JsonResponse(data, safe=False)
+
+        # default
+        return super().get(request, pk)
+
 
