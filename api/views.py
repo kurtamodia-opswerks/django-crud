@@ -107,6 +107,7 @@ class ProjectCRUDView(BaseCRUDView):
     form = ProjectForm
 
 
+# Extended views
 class SupervisorsByCompanyView(View):
     def get(self, request, company_id):
         try:
