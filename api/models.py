@@ -13,7 +13,7 @@ class Supervisor(models.Model):
     name = models.CharField(max_length=100)
     age = models.IntegerField(validators=[MinValueValidator(18), MaxValueValidator(100)])
     email = models.EmailField()
-    company = models.ForeignKey(Company, on_delete=models.CASCADE, null=True)
+    company = models.ForeignKey(Company, on_delete=models.CASCADE)
 
     def __str__(self):
         return self.name
@@ -35,9 +35,9 @@ class Intern(models.Model):
     
 class Project(models.Model):
     project_name = models.CharField(max_length=100)
-    company = models.ForeignKey(Company, on_delete=models.CASCADE, null=True)
-    intern = models.ForeignKey(Intern, on_delete=models.CASCADE, null=True)
-    supervisor = models.ForeignKey(Supervisor, on_delete=models.CASCADE, null=True)
+    company = models.ForeignKey(Company, on_delete=models.CASCADE)
+    intern = models.ForeignKey(Intern, on_delete=models.CASCADE)
+    supervisor = models.ForeignKey(Supervisor, on_delete=models.CASCADE)
     description = models.TextField()
 
     def __str__(self):
