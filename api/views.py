@@ -4,6 +4,8 @@ from django.views.decorators.csrf import csrf_exempt
 from django.utils.decorators import method_decorator
 from django.forms.models import model_to_dict
 import json
+from .models import Company, Supervisor, Intern, Project
+from .forms import CompanyForm, SupervisorForm, InternForm, ProjectForm
 
 # Parent view
 @method_decorator(csrf_exempt, name='dispatch')
@@ -60,4 +62,20 @@ class BaseCRUDView(View):
             return JsonResponse({'error': 'Object not found'})
         
 
+# Child views
+class CompanyCRUDView(BaseCRUDView):
+    model = Company
+    form = CompanyForm
+
+class InternCRUDView(BaseCRUDView):
+    model = Intern
+    form = InternForm
+
+class SupervisorCRUDView(BaseCRUDView):
+    model = Supervisor
+    form = SupervisorForm
+
+class ProjectCRUDView(BaseCRUDView):
+    model = Project
+    form = ProjectForm
 
