@@ -89,7 +89,7 @@ class InternCRUDView(BaseCRUDView):
         if company_id:
             interns = (
                 self.model.objects
-                .select_related('company', 'supervisor')
+                .select_related('company', 'supervisor')  
                 .filter(company_id=company_id)
             )
             data = [model_to_dict(intern) for intern in interns]
@@ -97,7 +97,6 @@ class InternCRUDView(BaseCRUDView):
 
         # Default
         return super().get(request, pk)
-
 
 class SupervisorCRUDView(BaseCRUDView):
     model = Supervisor
@@ -107,15 +106,59 @@ class ProjectCRUDView(BaseCRUDView):
     model = Project
     form = ProjectForm
 
-    def get(self, request, pk=None):
-        # If filtering by intern_id
-        intern_id = request.GET.get("intern_id")
-        if intern_id:
-            projects = self.model.objects.filter(intern_id=intern_id)
-            data = [model_to_dict(project) for project in projects]
-            return JsonResponse(data, safe=False)
 
-        # default
-        return super().get(request, pk)
+class SupervisorsByCompanyView(View):
+    def get(self, request, company_id):
+        try:
+            company = Company.objects.get(pk=company_id)
+        except Company.DoesNotExist:
+            return JsonResponse({"error": "Company not found"})
 
+        supervisors = company.supervisors.select_related('company').all()
+        data = [model_to_dict(supervisor) for supervisor in supervisors]
+        return JsonResponse(data, safe=False)
+    
+class InternsByCompanyView(View):
+    def get(self, request, company_id):
+        try:
+            company = Company.objects.get(pk=company_id)
+        except Company.DoesNotExist:
+            return JsonResponse({"error": "Company not found"})
 
+        interns = company.interns.select_related('company').all()
+        data = [model_to_dict(intern) for intern in interns]
+        return JsonResponse(data, safe=False)
+    
+class InternsBySupervisorView(View):
+    def get(self, request, supervisor_id):
+        try:
+            supervisor = Supervisor.objects.get(pk=supervisor_id)
+        except Supervisor.DoesNotExist:
+            return JsonResponse({"error": "Supervisor not found"})
+
+        interns = supervisor.interns.select_related('company').all()
+        data = [model_to_dict(intern) for intern in interns]
+        return JsonResponse(data, safe=False)
+    
+class ProjectsBySupervisorView(View):
+    def get(self, request, supervisor_id):
+        try:
+            supervisor = Supervisor.objects.get(pk=supervisor_id)
+        except Supervisor.DoesNotExist:
+            return JsonResponse({"error": "Supervisor not found"})
+
+        projects = supervisor.projects.select_related('company', 'intern', 'supervisor').all()
+        data = [model_to_dict(project) for project in projects]
+        return JsonResponse(data, safe=False)
+    
+class ProjectsByInternView(View):
+    def get(self, request, intern_id):
+        try:
+            intern = Intern.objects.get(pk=intern_id)
+        except Intern.DoesNotExist:
+            return JsonResponse({"error": "Intern not found"})
+
+        projects = intern.projects.select_related('company', 'intern', 'supervisor').all()
+        data = [model_to_dict(project) for project in projects]
+        return JsonResponse(data, safe=False)
+    

@@ -13,7 +13,7 @@ class Supervisor(models.Model):
     name = models.CharField(max_length=100)
     age = models.IntegerField(validators=[MinValueValidator(18), MaxValueValidator(100)])
     email = models.EmailField()
-    company = models.ForeignKey(Company, on_delete=models.CASCADE)
+    company = models.ForeignKey(Company, on_delete=models.CASCADE, related_name='supervisors')
 
     def __str__(self):
         return self.name
@@ -26,8 +26,8 @@ class Intern(models.Model):
     name = models.CharField(max_length=100)
     age = models.IntegerField(validators=[MinValueValidator(18), MaxValueValidator(100)])
     email = models.EmailField()
-    company = models.ForeignKey(Company, on_delete=models.CASCADE)
-    supervisor = models.ForeignKey('Supervisor', on_delete=models.SET_NULL, null=True)
+    company = models.ForeignKey(Company, on_delete=models.CASCADE, related_name='interns')
+    supervisor = models.ForeignKey('Supervisor', on_delete=models.SET_NULL, null=True, related_name='interns')
     status = models.CharField(max_length=10, choices=Status.choices, default=Status.ACTIVE)
 
     def __str__(self):
@@ -35,9 +35,9 @@ class Intern(models.Model):
     
 class Project(models.Model):
     project_name = models.CharField(max_length=100)
-    company = models.ForeignKey(Company, on_delete=models.CASCADE)
-    intern = models.ForeignKey(Intern, on_delete=models.CASCADE)
-    supervisor = models.ForeignKey(Supervisor, on_delete=models.CASCADE)
+    company = models.ForeignKey(Company, on_delete=models.CASCADE, related_name='projects')
+    intern = models.ForeignKey(Intern, on_delete=models.CASCADE, related_name='projects')
+    supervisor = models.ForeignKey(Supervisor, on_delete=models.CASCADE, related_name='projects')
     description = models.TextField()
 
     def __str__(self):
